@@ -14,8 +14,8 @@ import pandas as pd
 pygame.init()
 
 # Constants for display
-SCREEN_WIDTH = 1200
-SCREEN_HEIGHT = 800
+SCREEN_WIDTH = 1400
+SCREEN_HEIGHT = 1000
 BG_COLOR = (240, 240, 240)
 CITY_COLOR = (0, 100, 200)
 ANT_COLOR = (200, 0, 0)
@@ -551,6 +551,25 @@ class ACOVisualizer:
             manager=self.ui_manager
         )
     
+        # After the Instructions section, use a new y_pos value
+        y_pos += 120  # Add enough space after instructions text box
+        
+        # Create a clearly visible save image button
+        self.save_image_button = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect(panel_rect.left + 10, y_pos, 250, 35),  # Make it wider and taller
+            text='Save Screenshot as PNG',  # More descriptive text
+            manager=self.ui_manager,
+            object_id=pygame_gui.core.ObjectID(class_id='@important_buttons')  # Special styling
+        )
+        
+        # Add another button below it for saving data
+        y_pos += 45
+        self.save_data_button = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect(panel_rect.left + 10, y_pos, 250, 35),
+            text='Save City Data',
+            manager=self.ui_manager
+        )
+    
     def apply_parameters(self):
         # Get parameter values from sliders
         n_cities = int(self.param_sliders['cities'].get_current_value())
@@ -743,14 +762,44 @@ class ACOVisualizer:
                             self.aco.iteration_best_paths = []
                             self.aco.iteration_best_lengths = []
                         elif event.ui_element == self.save_image_button:
-                            # Simple direct save without dialog
+                            # Use direct filedialog from tkinter
+                            import tkinter as tk
+                            from tkinter import filedialog
+                            
+                            root = tk.Tk()
+                            root.withdraw()  # Hide the main window
+                            
                             file_path = filedialog.asksaveasfilename(
-                                title="Save Visualization Image",
+                                title="Save Visualization as Image",
                                 filetypes=[("PNG Image", "*.png")],
                                 defaultextension=".png"
                             )
+                            
                             if file_path:
                                 self.save_visualization_as_image(file_path)
+                                # Show confirmation on screen
+                                print(f"Image saved to {file_path}")
+                        elif event.ui_element == self.save_data_button:
+                            self.save_cities_dialog()
+                
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_s:  # 'S' key
+                        # Create file dialog for saving image
+                        import tkinter as tk
+                        from tkinter import filedialog
+                        
+                        root = tk.Tk()
+                        root.withdraw()  # Hide the main window
+                        
+                        file_path = filedialog.asksaveasfilename(
+                            title="Save Visualization as Image",
+                            filetypes=[("PNG Image", "*.png")],
+                            defaultextension=".png"
+                        )
+                        
+                        if file_path:
+                            self.save_visualization_as_image(file_path)
+                            print(f"Image saved to {file_path}")
                 
                 elif event.type == pygame_gui.UI_HORIZONTAL_SLIDER_MOVED:
                     if event.ui_element == self.speed_slider:
