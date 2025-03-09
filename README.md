@@ -13,15 +13,6 @@ This is a Python-based visualization tool for the Ant Colony Optimization algori
 - Step-by-step or continuous animation
 - Pheromone trail visualization
 
-## Requirements
-
-```
-pygame>=2.1.0
-pygame_gui>=0.6.0
-numpy>=1.20.0
-pandas>=1.0.0
-```
-
 ## Installation
 
 1. Clone the repository or download the source code
