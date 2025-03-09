@@ -140,6 +140,9 @@ The application supports different JSON formats:
 
 The best path found by the ACO algorithm will be displayed on the screen. You can save the city configuration and coordinates by clicking "Save Cities".
 
+## Screenshots
+![ACO Visualization Example](./screenshots/aco_example.png)
+
 ## Customization
 
 You can modify the following constants in the code:
