@@ -543,6 +543,13 @@ class ACOVisualizer:
                     "- Use 'Start/Pause/Step' to control simulation",
             manager=self.ui_manager
         )
+        
+        # Add this near where other buttons are created
+        self.save_image_button = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect(panel_rect.left + 10, y_pos, button_width * 2 + 10, button_height),
+            text='Save Current View as Image',
+            manager=self.ui_manager
+        )
     
     def apply_parameters(self):
         # Get parameter values from sliders
@@ -735,7 +742,15 @@ class ACOVisualizer:
                             self.aco.current_iteration = 0
                             self.aco.iteration_best_paths = []
                             self.aco.iteration_best_lengths = []
-
+                        elif event.ui_element == self.save_image_button:
+                            # Simple direct save without dialog
+                            file_path = filedialog.asksaveasfilename(
+                                title="Save Visualization Image",
+                                filetypes=[("PNG Image", "*.png")],
+                                defaultextension=".png"
+                            )
+                            if file_path:
+                                self.save_visualization_as_image(file_path)
                 
                 elif event.type == pygame_gui.UI_HORIZONTAL_SLIDER_MOVED:
                     if event.ui_element == self.speed_slider:
@@ -853,6 +868,80 @@ class ACOVisualizer:
             name_label = self.font.render(name, True, TEXT_COLOR)
             self.screen.blit(name_label, (x + 10, y - 10))
 
+    def save_visualization_as_image(self, filename):
+        """Save the current ACO visualization as a PNG image with enhanced city labels and path information"""
+        # Create a copy of the current display surface
+        image_surface = self.screen.copy()
+        
+        # Clear any existing ant trails from the image (we only want final path)
+        image_surface.fill(BG_COLOR)
+        
+        # Draw panel background
+        panel_rect = pygame.Rect(self.width - 280, 0, 280, self.height)
+        pygame.draw.rect(image_surface, (220, 220, 220), panel_rect)
+        
+        # Draw cities with enhanced labels
+        large_font = pygame.font.SysFont(None, FONT_SIZE + 8)
+        for i, city in enumerate(self.cities):
+            if isinstance(city, dict):
+                x, y = city['x'], city['y']
+                name = city.get('name', f"City {i+1}")
+            else:
+                x, y = city
+                name = f"City {i+1}"
+                
+            # Draw larger city circles
+            pygame.draw.circle(image_surface, CITY_COLOR, (x, y), 10)
+            
+            # Draw clearer city names with background for better visibility
+            name_label = large_font.render(name, True, (0, 0, 0))
+            label_bg = pygame.Rect(x + 12, y - 12, name_label.get_width() + 4, name_label.get_height() + 4)
+            pygame.draw.rect(image_surface, (255, 255, 255, 180), label_bg)
+            image_surface.blit(name_label, (x + 14, y - 10))
+        
+        # Draw only the best path
+        best_path = self.aco.get_best_path()
+        if best_path:
+            points = []
+            for city_idx in best_path:
+                city = self.cities[city_idx]
+                if isinstance(city, dict):
+                    points.append((city['x'], city['y']))
+                else:
+                    points.append(city)
+            
+            # Draw with thicker line for visibility
+            pygame.draw.lines(image_surface, (0, 0, 0), True, points, 3)
+        
+        # Add information footer
+        info_font = pygame.font.SysFont(None, FONT_SIZE + 4)
+        distance_unit = 'km' if self.aco.is_geo else 'units'
+        info_texts = [
+            f"Best Path Length: {self.aco.get_best_path_length():.2f} {distance_unit}",
+            f"Cities: {self.n_cities} | Iterations: {self.aco.current_iteration}",
+            f"Algorithm: Ant Colony Optimization | Date: {time.strftime('%Y-%m-%d %H:%M')}",
+            f"Mode: {'Geographic' if self.aco.is_geo else 'Euclidean'} coordinates"
+        ]
+        
+        # Create footer background
+        footer_height = len(info_texts) * 25 + 20
+        footer_rect = pygame.Rect(0, self.height - footer_height, self.width, footer_height)
+        footer_surface = pygame.Surface((footer_rect.width, footer_rect.height), pygame.SRCALPHA)
+        footer_surface.fill((240, 240, 240, 230))
+        image_surface.blit(footer_surface, footer_rect)
+        
+        # Add the information text
+        y_pos = self.height - footer_height + 10
+        for text in info_texts:
+            text_surf = info_font.render(text, True, (0, 0, 0))
+            image_surface.blit(text_surf, (20, y_pos))
+            y_pos += 25
+        
+        # Save the surface as PNG
+        pygame.image.save(image_surface, filename)
+        print(f"Visualization saved as {filename}")
+        return True
+
 # Fix the error in load_cities_from_file function
 def load_cities_from_file(filename):
     try:
@@ -886,22 +975,56 @@ def load_from_csv(filename):
         lat_col = None
         lng_col = None
         
-        # Find appropriate columns by name (more precise matching)
+        # Prioritize location > city > country for name column
+        # First pass: Look specifically for location column
         for col in df.columns:
             col_lower = col.lower()
-            # Use exact matches or specific patterns for column names
-            if col_lower in ['city', 'name', 'location'] or col_lower.startswith('city'):
+            if col_lower == 'location':
                 city_col = col
-                print(f"Using as city column: {col}")
-            elif col_lower in ['country', 'nation'] or col_lower == 'countries':
+                print(f"Using as primary location column: {col}")
+                break
+        
+        # Second pass: If no location column found, look for city column
+        if city_col is None:
+            for col in df.columns:
+                col_lower = col.lower()
+                if col_lower == 'city' or col_lower.startswith('city'):
+                    city_col = col
+                    print(f"Using as city column: {col}")
+                    break
+        
+        # Third pass: Look for other name-related columns if still not found
+        if city_col is None:
+            for col in df.columns:
+                col_lower = col.lower()
+                if col_lower == 'name':
+                    city_col = col
+                    print(f"Using as name column: {col}")
+                    break
+        
+        # Find country column
+        for col in df.columns:
+            col_lower = col.lower()
+            if col_lower in ['country', 'nation'] or col_lower == 'countries':
                 country_col = col
                 print(f"Using as country column: {col}")
-            elif col_lower in ['lat', 'latitude']:
+                break
+                
+        # Find latitude column
+        for col in df.columns:
+            col_lower = col.lower()
+            if col_lower in ['lat', 'latitude']:
                 lat_col = col
                 print(f"Using as latitude column: {col}")
-            elif col_lower in ['lon', 'lng', 'long', 'longitude']:
+                break
+                
+        # Find longitude column
+        for col in df.columns:
+            col_lower = col.lower()
+            if col_lower in ['lon', 'lng', 'long', 'longitude']:
                 lng_col = col
                 print(f"Using as longitude column: {col}")
+                break
         
         # If we couldn't find the expected columns, try to use positional columns
         if not (lat_col and lng_col):
