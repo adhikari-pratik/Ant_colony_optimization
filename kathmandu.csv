@@ -1,0 +1,44 @@
+,Location,Ward,City,latitude,longitude,Area(sq km),Population Density (per sq km)
+0,Naxal,Ward 1,Kathmandu,27.7126782,85.3287033,1.3818,5795.0
+1,Lazimpat,Ward 2,Kathmandu,27.7215082,85.3207646,0.8181,16438.0
+2,Maharajgunj,Ward 3,Kathmandu,27.7330791,85.3288072,3.0854,11300.0
+3,"Baluwatar,",Ward 4,Kathmandu,27.7246028,85.3310167,3.3498,14139.0
+4,Tangal,Ward 5,Kathmandu,27.7172307,85.3304488,0.7875,23263.0
+5,Bouddha,Ward 6,Kathmandu,27.7220534,85.3620811,3.6078,16726.0
+6,Mitrapark,Ward 7,Kathmandu,27.71336,85.3450409,1.7481,29507.0
+7,Jayabageshwori,Ward 8,Kathmandu,27.7103357,85.34402476761059,2.9181,3680.0
+8,Gaushala,Ward 9,Kathmandu,27.7097063,85.34640940581787,2.9378,13742.0
+9,New Baneshwor,Ward 10,Kathmandu,27.6926211,85.3380718,1.5643,25455.0
+10,Tripureshwor,Ward 11,Kathmandu,27.695,85.3149,1.8126,9801.0
+11,Kalimati,Ward 12 and 13,Kathmandu,27.698583,85.299157,2.7843,19293.0
+12,Kalanki,Ward 14,Kathmandu,27.6932983,85.2816525,3.4651,16881.0
+13,Swayambhu,Ward 15,Kathmandu,27.7161935,85.2838241,3.3358,16331.0
+14,Sohrakhutte,Ward 16,Kathmandu,27.7254063,85.3054571,4.6335,18224.0
+15,Chhetrapati,Ward 17,Kathmandu,27.7112071,85.3086148,0.6661,38922.0
+16,Bhimsenthan,"Ward 18,19,20,21",Kathmandu,27.703,85.3036,0.6416,71933.0
+17,Om Bahal,"Ward 22,23,24,25",Kathmandu,27.7015,85.308,0.6624,57920.0
+18,Lainchaur,Ward 26 and 27,Kathmandu,27.71941,85.315162,2.2303,24039.0
+19,Purano Buspark,Ward 28,Kathmandu,27.7053,85.3149,1.0369,15634.0
+20,Dillibazar,Ward 29,Kathmandu,27.706321,85.3271617,1.2790000000000001,26048.0
+21,Gyaneshwor,Ward 30,Kathmandu,27.7082182,85.33138320010978,0.8598,29884.0
+22,Bhimsengola,Ward 31,Kathmandu,27.6998367,85.3443133,2.3532,28098.0
+23,Koteshwor,Ward 32,Kathmandu,27.679087,85.347599,3.9822,19160.0
+24,Sanepa,Ward 2,Lalitpur,27.6837719,85.309353,1.1115,17148.0
+25,Pulchowk,Ward 3,Lalitpur,27.6783567,85.3206084,1.6523,8522.0
+26,Jawalakhel,Ward 4,Lalitpur,27.6724402,85.3133757,2.0386,7538.0
+27,Lagankhel,Ward 5,Lalitpur,27.6668726,85.3236357,0.7635,8387.0
+28,Kanibahal,"Ward 6, 7 and 8",Lalitpur,27.6667273,85.3280068,0.9305,89212.0
+29,Bhol Dhoka,Ward 9,Lalitpur,27.6714,85.3324,0.7677,18146.0
+30,Kupandole,Ward 10,Lalitpur,27.6862,85.3149,0.7619,8602.0
+31,Kusunti,Ward 13,Lalitpur,27.6639122,85.3148968,0.7513,19788.0
+32,Nakhipot,Ward 14,Lalitpur,27.6503928,85.3207649,1.7205,12341.0
+33,Satdobato,Ward 15,Lalitpur,27.657521,85.3250564,2.2807,6076.0
+34,Sainbhu,Ward 18,Lalitpur,27.6493,85.3059,2.0056,4062.0
+35,Khokhana,Ward 21,Lalitpur,27.6431,85.2955,3.1696,1554.0
+36,Bungmati,Ward 22,Lalitpur,27.6285987,85.303669,3.8884,1534.0
+37,Dhapakhel,Ward 23 and 24,Lalitpur,27.6279927,85.3323532,3.6718,7342.0
+38,Bhaisepati,Ward 25,Lalitpur,27.6561677,85.3060365,2.1131,5478.0
+39,Chibahal Sunakothi,Ward 26,Lalitpur,27.6428,85.3173,1.55,3750.0
+40,Sunakothi,Ward 27,Lalitpur,27.6349636,85.31652560239192,1.4675,2976.0
+41,Kanikhel Harisiddhi,Ward 28,Lalitpur,27.64304,85.3478,1.8037,3646.0
+42,Lakhapukhu Harisiddhi,Ward 29,Lalitpur,27.6338,85.3419,1.2962,3209.0
