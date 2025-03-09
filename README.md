@@ -101,6 +101,7 @@ The application supports different JSON formats:
 - **Reset Iteration**: Reset the iteration counter
 - **Apply Parameters**: Apply any parameter changes
 - **Toggle Pheromones**: Show or hide pheromone trails
+- **save image as png**: Save image
 
 ### Sliders
 - **Animation Speed**: Control the simulation speed (fps)
@@ -138,7 +139,8 @@ The application supports different JSON formats:
 
 ## Output
 
-The best path found by the ACO algorithm will be displayed on the screen. You can save the city configuration and coordinates by clicking "Save Cities".
+The best path found by the ACO algorithm will be displayed on the screen and can be saved using keyword 'S' or using save image as png button . You can save the city configuration and coordinates by clicking "Save Cities". 
+ 
 
 ## Screenshots
 ![ACO Visualization Example](./screenshots/visualization.png)
