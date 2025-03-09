@@ -1,4 +1,4 @@
-Collecting workspace information# Ant Colony Optimization (ACO) Visualization
+# Ant Colony Optimization (ACO) Visualization
 
 This is a Python-based visualization tool for the Ant Colony Optimization algorithm applied to the Traveling Salesman Problem (TSP). The application provides an interactive GUI to visualize how ants find the shortest path connecting all cities.
 
