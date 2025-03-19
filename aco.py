@@ -10,10 +10,10 @@ import math
 from tkinter import filedialog
 import pandas as pd
 
-# Initialize pygame
+
 pygame.init()
 
-# Constants for display
+
 SCREEN_WIDTH = 1400
 SCREEN_HEIGHT = 1000
 BG_COLOR = (240, 240, 240)
@@ -29,18 +29,17 @@ def haversine(lon1, lat1, lon2, lat2):
     Calculate the great circle distance between two points 
     on the earth (specified in decimal degrees)
     """
-    # Convert decimal degrees to radians
+    
     lon1, lat1, lon2, lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
     
-    # Haversine formula
+    
     dlon = lon2 - lon1 
     dlat = lat2 - lat1 
     a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
     c = 2 * math.asin(math.sqrt(a)) 
-    r = 6371  # Radius of earth in kilometers
+    r = 6371  
     return c * r
 
-# Modify the scale_geo_coords function to preserve original coordinates and names
 def scale_geo_coords(coords_data, width, height, padding=50):
     """
     Scale geographic coordinates to screen coordinates
@@ -49,30 +48,23 @@ def scale_geo_coords(coords_data, width, height, padding=50):
     if not coords_data:
         return []
         
-    # Extract lat/lon values
     lats = [point['lat'] for point in coords_data]
     lons = [point['lng'] for point in coords_data]
     
-    # Find bounds
     min_lat, max_lat = min(lats), max(lats)
     min_lon, max_lon = min(lons), max(lons)
     
-    # Calculate available screen area
-    screen_width = width - 300 - padding * 2  # Reserve space for UI panel
+    screen_width = width - 300 - padding * 2  
     screen_height = height - padding * 2
     
-    # Scale and flip coords (latitude increases northward)
     scaled_cities = []
     for city in coords_data:
-        # Convert to [0, 1] range
         x_ratio = 0.0 if max_lon == min_lon else (city['lng'] - min_lon) / (max_lon - min_lon)
         y_ratio = 0.0 if max_lat == min_lat else (city['lat'] - min_lat) / (max_lat - min_lat)
         
-        # Convert to screen coordinates
         x = padding + x_ratio * screen_width
-        y = padding + (1 - y_ratio) * screen_height  # Flip Y (screen coords start at top)
+        y = padding + (1 - y_ratio) * screen_height  
         
-        # Create city object with all data
         scaled_cities.append({
             'name': city.get('name', 'Unknown'),
             'x': x,
@@ -102,9 +94,8 @@ class AntColonyOptimization:
         self.iteration_best_paths = []
         self.iteration_best_lengths = []
         
-        # For visualization
-        self.ant_positions = []  # Current positions of ants
-        self.ant_trails = []     # Paths taken by ants
+        self.ant_positions = []  
+        self.ant_trails = []     
         self.current_iteration = 0
         
     def calculate_distances(self):
@@ -117,13 +108,11 @@ class AntColonyOptimization:
             for j in range(self.n_cities):
                 if i != j:
                     if self.is_geo and 'lat' in self.cities[i] and 'lng' in self.cities[i]:
-                        # Use haversine for geographic coordinates
                         distances[i, j] = haversine(
                             self.cities[i]['lng'], self.cities[i]['lat'],
                             self.cities[j]['lng'], self.cities[j]['lat']
                         )
                     else:
-                        # Use Euclidean for screen coordinates
                         distances[i, j] = np.sqrt(
                             (self.cities[i]['x'] - self.cities[j]['x'])**2 + 
                             (self.cities[i]['y'] - self.cities[j]['y'])**2
@@ -131,7 +120,6 @@ class AntColonyOptimization:
                 else:
                     distances[i, j] = np.inf
         
-        # Print more comprehensive distance information
         if self.is_geo:
             print("\n---------- SAMPLE DISTANCES ----------")
             print("City pairs with distances (first 5 examples):")
@@ -142,7 +130,6 @@ class AntColonyOptimization:
                         print(f"From {self.cities[i]['name']} to {self.cities[j]['name']}: {distances[i, j]:.2f} km")
                         count += 1
             
-            # Also print the min, max and average distances
             all_distances = [distances[i, j] for i in range(self.n_cities) for j in range(i+1, self.n_cities)]
             if all_distances:
                 print(f"Minimum distance: {min(all_distances):.2f} km")
@@ -156,27 +143,22 @@ class AntColonyOptimization:
         if self.n_cities < 2:
             return None, float('inf')  # Need at least 2 cities
             
-        # Initialize ant positions and trails for this iteration
         self.ant_positions = [np.random.randint(0, self.n_cities) for _ in range(self.n_ants)]
         self.ant_trails = [[pos] for pos in self.ant_positions]
         
-        # Generate paths for all ants
         all_paths = []
         for ant in range(self.n_ants):
             path = self.gen_path(self.ant_positions[ant])
             all_paths.append(path)
             
-        # Update pheromones
         self.spread_pheromone(all_paths)
         self.pheromones = self.pheromones * self.decay
         
-        # Find best path for this iteration
         iteration_best_path = min(all_paths, key=lambda x: self.path_length(x))
         iteration_best_length = self.path_length(iteration_best_path)
         self.iteration_best_paths.append(iteration_best_path)
         self.iteration_best_lengths.append(iteration_best_length)
         
-        # Update overall best path
         if iteration_best_length < self.best_path_length:
             self.best_path = iteration_best_path
             self.best_path_length = iteration_best_length
@@ -192,24 +174,18 @@ class AntColonyOptimization:
             current = path[-1]
             unvisited = list(set(range(self.n_cities)) - visited)
             
-            # Calculate probabilities for each unvisited city
             probabilities = self.calculate_probabilities(current, unvisited)
             
-            # Choose next city
             next_city = np.random.choice(unvisited, p=probabilities)
             
-            # Update path
             path.append(next_city)
             visited.add(next_city)
             
-            # Update ant trail for visualization
             ant_idx = self.ant_positions.index(start)
             self.ant_trails[ant_idx].append(next_city)
             
-        # Complete the tour by returning to the start city
         path.append(path[0])
         
-        # Update ant trail for visualization
         ant_idx = self.ant_positions.index(start)
         self.ant_trails[ant_idx].append(path[0])
         
@@ -226,9 +202,7 @@ class AntColonyOptimization:
             denominator += numerator
             probabilities.append(numerator)
         
-        # Normalize probabilities
         if denominator == 0:
-            # Avoid division by zero
             return np.ones(len(unvisited)) / len(unvisited)
         probabilities = np.array(probabilities) / denominator
         return probabilities
@@ -259,7 +233,6 @@ class AntColonyOptimization:
         self.iteration_best_lengths = []
         self.current_iteration = 0
         
-        # Reset visualization data
         self.ant_positions = []
         self.ant_trails = []
     
@@ -278,7 +251,6 @@ class AntColonyOptimization:
     def get_pheromone_levels(self):
         return self.pheromones
 
-# Visualization with Pygame
 class ACOVisualizer:
     def __init__(self, n_cities=20, n_ants=10, width=SCREEN_WIDTH, height=SCREEN_HEIGHT):
         self.width = width
@@ -286,20 +258,16 @@ class ACOVisualizer:
         self.n_cities = n_cities
         self.n_ants = n_ants
         
-        # Pygame setup
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("Ant Colony Optimization Visualization")
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont(None, FONT_SIZE)
         
-        # UI Manager for buttons and sliders
         self.ui_manager = pygame_gui.UIManager((width, height))
         
-        # Generate cities
         self.cities = []
         self.generate_cities()
         
-        # Create ACO instance
         self.aco = AntColonyOptimization(
             self.cities, 
             n_ants=n_ants, 
@@ -308,22 +276,18 @@ class ACOVisualizer:
             beta=2.0
         )
         
-        # Animation control
         self.paused = True
-        self.speed = 10  # frames per second
+        self.speed = 10  
         self.step_mode = False
         self.show_pheromones = True
         self.target_iteration = 100  # Default target iteration
         self.running_to_target = False  # Flag for animated run to target
         
-        # Manual city placement mode
         self.manual_mode = False
         
-        # Create UI elements
         self.create_ui()
         
     def generate_cities(self):
-        # Clear existing cities
         self.cities = []
         
         # Allow for some padding from the edges
@@ -603,21 +567,7 @@ class ACOVisualizer:
         panel_rect = pygame.Rect(self.width - 280, 0, 280, self.height)
         pygame.draw.rect(self.screen, (220, 220, 220), panel_rect)
         
-        # Draw cities
-        for i, city in enumerate(self.cities):
-            # Handle both dictionary and tuple formats for backward compatibility
-            if isinstance(city, dict):
-                x, y = city['x'], city['y']
-                name = city.get('name', str(i))
-            else:
-                x, y = city
-                name = str(i)
-                
-            pygame.draw.circle(self.screen, CITY_COLOR, (x, y), 8)
-            name_label = self.font.render(name, True, TEXT_COLOR)
-            self.screen.blit(name_label, (x + 10, y - 10))
-        
-        # Draw pheromone levels
+        # Draw pheromone levels FIRST
         if self.show_pheromones and self.n_cities > 1:
             pheromones = self.aco.get_pheromone_levels()
             max_pheromone = np.max(pheromones) if np.max(pheromones) > 0 else 1
@@ -659,6 +609,54 @@ class ACOVisualizer:
                             points.append(city)
                     pygame.draw.lines(self.screen, PATH_COLOR, False, points, 1)
         
+        # Draw best path if available
+        best_path = self.aco.get_best_path()
+        if best_path:
+            points = []
+            for city_idx in best_path:
+                city = self.cities[city_idx]
+                if isinstance(city, dict):
+                    points.append((city['x'], city['y']))
+                else:
+                    points.append(city)
+            pygame.draw.lines(self.screen, (0, 0, 0), True, points, 2)
+        
+        # Draw cities SECOND (on top of paths)
+        for i, city in enumerate(self.cities):
+            # Handle both dictionary and tuple formats for backward compatibility
+            if isinstance(city, dict):
+                x, y = city['x'], city['y']
+            else:
+                x, y = city
+                
+            pygame.draw.circle(self.screen, CITY_COLOR, (x, y), 8)
+        
+        # Draw city labels LAST (with background for better visibility)
+        for i, city in enumerate(self.cities):
+            # Handle both dictionary and tuple formats for backward compatibility
+            if isinstance(city, dict):
+                x, y = city['x'], city['y']
+                name = city.get('name', str(i))
+            else:
+                x, y = city
+                name = str(i)
+                
+            # Create label with background for visibility
+            name_label = self.font.render(name, True, TEXT_COLOR)
+            
+            # Calculate label background position and size
+            label_bg = pygame.Rect(x + 10, y - 10, 
+                                name_label.get_width() + 4, 
+                                name_label.get_height() + 2)
+            
+            # Draw semi-transparent white background
+            bg_surface = pygame.Surface((label_bg.width, label_bg.height), pygame.SRCALPHA)
+            bg_surface.fill((255, 255, 255, 200))  # White with alpha
+            self.screen.blit(bg_surface, label_bg)
+            
+            # Draw the text on top of background
+            self.screen.blit(name_label, (x + 12, y - 9))
+        
         # Draw ants
         if self.n_cities > 1:
             for ant_idx, pos in enumerate(self.aco.get_ant_positions()):
@@ -672,18 +670,6 @@ class ACOVisualizer:
                         else:
                             ant_x, ant_y = city
                         pygame.draw.circle(self.screen, ANT_COLOR, (ant_x, ant_y), 5)
-        
-        # Draw best path if available
-        best_path = self.aco.get_best_path()
-        if best_path:
-            points = []
-            for city_idx in best_path:
-                city = self.cities[city_idx]
-                if isinstance(city, dict):
-                    points.append((city['x'], city['y']))
-                else:
-                    points.append(city)
-            pygame.draw.lines(self.screen, (0, 0, 0), True, points, 2)
         
         # Draw information
         info_text = [
@@ -1199,7 +1185,6 @@ def load_from_json(filename):
                     if cities:
                         return cities
             
-            # Handle simple array format [[x,y], [x,y], ...]
             cities = []
             for item in data:
                 if isinstance(item, list) and len(item) >= 2:
@@ -1213,10 +1198,8 @@ def load_from_json(filename):
         print(f"Error loading from JSON: {e}")
         return None
 
-# Replace the existing save_cities_to_file function
 def save_cities_to_file(cities, filename):
     try:
-        # Determine file type by extension
         _, ext = os.path.splitext(filename)
         ext = ext.lower()
         
@@ -1233,7 +1216,6 @@ def save_cities_to_file(cities, filename):
         print(f"Error saving cities to file: {e}")
         return False
 
-# Main function
 if __name__ == "__main__":
     import argparse
     
@@ -1247,7 +1229,6 @@ if __name__ == "__main__":
     
     visualizer = ACOVisualizer(n_cities=args.cities, n_ants=args.ants)
     
-    # Load cities from file if specified
     if args.load:
         cities = load_cities_from_file(args.load)
         if cities:
@@ -1256,9 +1237,7 @@ if __name__ == "__main__":
             visualizer.aco.update_coords(cities)
             visualizer.param_sliders['cities'].set_current_value(len(cities))
     
-    # Run the visualization
     visualizer.run()
     
-    # Save cities to file if specified
     if args.save:
         save_cities_to_file(visualizer.cities, args.save)
