@@ -25,10 +25,6 @@ TEXT_COLOR = (50, 50, 50)
 FONT_SIZE = 16
 
 def haversine(lon1, lat1, lon2, lat2):
-    """
-    Calculate the great circle distance between two points 
-    on the earth (specified in decimal degrees)
-    """
     
     lon1, lat1, lon2, lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
     
@@ -41,10 +37,7 @@ def haversine(lon1, lat1, lon2, lat2):
     return c * r
 
 def scale_geo_coords(coords_data, width, height, padding=50):
-    """
-    Scale geographic coordinates to screen coordinates
-    coords_data: list of dicts with 'name', 'lat', 'lng'
-    """
+    
     if not coords_data:
         return []
         
@@ -76,7 +69,6 @@ def scale_geo_coords(coords_data, width, height, padding=50):
         
     return scaled_cities
 
-# ACO Algorithm Implementation
 class AntColonyOptimization:
     def __init__(self, cities, n_ants=10, decay=0.95, alpha=1.0, beta=2.0):
         self.cities = cities
@@ -100,7 +92,7 @@ class AntColonyOptimization:
         
     def calculate_distances(self):
         distances = np.zeros((self.n_cities, self.n_cities))
-        print("\n========== DISTANCE CALCULATION ==========")
+        
         print(f"Calculating distances between {self.n_cities} cities")
         print(f"Geographic mode: {self.is_geo}")
         
@@ -121,8 +113,7 @@ class AntColonyOptimization:
                     distances[i, j] = np.inf
         
         if self.is_geo:
-            print("\n---------- SAMPLE DISTANCES ----------")
-            print("City pairs with distances (first 5 examples):")
+            
             count = 0
             for i in range(self.n_cities):
                 for j in range(i+1, self.n_cities):
@@ -135,7 +126,7 @@ class AntColonyOptimization:
                 print(f"Minimum distance: {min(all_distances):.2f} km")
                 print(f"Maximum distance: {max(all_distances):.2f} km")
                 print(f"Average distance: {sum(all_distances)/len(all_distances):.2f} km")
-            print("======================================\n")
+            
         
         return distances
     
@@ -290,7 +281,6 @@ class ACOVisualizer:
     def generate_cities(self):
         self.cities = []
         
-        # Allow for some padding from the edges
         padding = 50
         city_area_width = self.width - 300 - padding * 2  # Reserve 300px for UI panel
         city_area_height = self.height - padding * 2
@@ -345,7 +335,6 @@ class ACOVisualizer:
         
         y_pos += button_height + button_margin
         
-        # Add file loading/saving buttons
         self.load_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(panel_rect.left + 10, y_pos, button_width, button_height),
             text='Load Cities',
@@ -374,7 +363,6 @@ class ACOVisualizer:
         
         y_pos += button_height + button_margin
         
-        # Add manual city placement button
         self.manual_mode_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(panel_rect.left + 10, y_pos, button_width, button_height),
             text='Add Cities Manually',
@@ -389,7 +377,6 @@ class ACOVisualizer:
         
         y_pos += button_height + button_margin * 2
         
-        # Slider for speed control
         self.speed_slider_label = pygame_gui.elements.UILabel(
             relative_rect=pygame.Rect(panel_rect.left + 10, y_pos, 250, 20),
             text='Animation Speed',
@@ -407,7 +394,6 @@ class ACOVisualizer:
         
         y_pos += 30 + button_margin
         
-        # Parameter control
         self.param_labels = {}
         self.param_sliders = {}
         
@@ -452,7 +438,6 @@ class ACOVisualizer:
         
         y_pos += button_height + button_margin * 2
         
-        # Target iteration slider
         self.target_iter_label = pygame_gui.elements.UILabel(
             relative_rect=pygame.Rect(panel_rect.left + 10, y_pos, 250, 20),
             text='Target Iteration',
@@ -470,7 +455,6 @@ class ACOVisualizer:
         
         y_pos += 30 + button_margin
         
-        # Apply button
         self.apply_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(panel_rect.left + 60, y_pos, 150, button_height),
             text='Apply Parameters',
@@ -479,7 +463,6 @@ class ACOVisualizer:
         
         y_pos += button_height + button_margin * 2
         
-        # Toggle for showing pheromones
         self.show_pheromones_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(panel_rect.left + 60, y_pos, 150, button_height),
             text='Toggle Pheromones',
@@ -497,7 +480,6 @@ class ACOVisualizer:
         
         y_pos += 25
         
-        # Instructions
         self.instructions_label = pygame_gui.elements.UITextBox(
             relative_rect=pygame.Rect(panel_rect.left + 10, y_pos, 250, 100),
             html_text="<b>Instructions:</b><br>"
@@ -508,17 +490,14 @@ class ACOVisualizer:
             manager=self.ui_manager
         )
         
-        # Add this near where other buttons are created
         self.save_image_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(panel_rect.left + 10, y_pos, button_width * 2 + 10, button_height),
             text='Save Current View as Image',
             manager=self.ui_manager
         )
     
-        # After the Instructions section, use a new y_pos value
         y_pos += 120  # Add enough space after instructions text box
         
-        # Create a clearly visible save image button
         self.save_image_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(panel_rect.left + 10, y_pos, 250, 35),  # Make it wider and taller
             text='Save Screenshot as PNG',  # More descriptive text
@@ -526,7 +505,6 @@ class ACOVisualizer:
             object_id=pygame_gui.core.ObjectID(class_id='@important_buttons')  # Special styling
         )
         
-        # Add another button below it for saving data
         y_pos += 45
         self.save_data_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(panel_rect.left + 10, y_pos, 250, 35),
@@ -535,19 +513,16 @@ class ACOVisualizer:
         )
     
     def apply_parameters(self):
-        # Get parameter values from sliders
         n_cities = int(self.param_sliders['cities'].get_current_value())
         n_ants = int(self.param_sliders['ants'].get_current_value())
         alpha = self.param_sliders['alpha'].get_current_value()
         beta = self.param_sliders['beta'].get_current_value()
         decay = self.param_sliders['decay'].get_current_value()
         
-        # Only regenerate cities if the number has changed and we're not in manual mode
         if n_cities != self.n_cities and not self.manual_mode:
             self.n_cities = n_cities
             self.generate_cities()
         
-        # Create new ACO instance with updated parameters
         self.aco = AntColonyOptimization(
             self.cities, 
             n_ants=n_ants, 
@@ -560,14 +535,12 @@ class ACOVisualizer:
         self.paused = True
     
     def draw(self):
-        # Clear screen
         self.screen.fill(BG_COLOR)
         
         # Draw panel background
         panel_rect = pygame.Rect(self.width - 280, 0, 280, self.height)
         pygame.draw.rect(self.screen, (220, 220, 220), panel_rect)
         
-        # Draw pheromone levels FIRST
         if self.show_pheromones and self.n_cities > 1:
             pheromones = self.aco.get_pheromone_levels()
             max_pheromone = np.max(pheromones) if np.max(pheromones) > 0 else 1
@@ -575,27 +548,21 @@ class ACOVisualizer:
             for i in range(self.n_cities):
                 for j in range(i+1, self.n_cities):
                     if pheromones[i, j] > 0:
-                        # Normalize pheromone level and convert to line width and alpha
                         level = max(pheromones[i, j], pheromones[j, i])
                         norm_level = level / max_pheromone
                         width = int(1 + 5 * norm_level)
                         alpha = int(50 + 200 * norm_level)
                         
-                        # Create a surface for the line with alpha
                         line_color = (*PHEROMONE_COLOR, alpha)
                         
-                        # Get coordinates from city objects
                         city_i = self.cities[i]
                         city_j = self.cities[j]
                         
-                        # Extract coordinates based on the format of city objects
                         start_pos = (city_i['x'], city_i['y']) if isinstance(city_i, dict) else city_i
                         end_pos = (city_j['x'], city_j['y']) if isinstance(city_j, dict) else city_j
                         
-                        # Draw the line
                         pygame.draw.line(self.screen, line_color, start_pos, end_pos, width)
         
-        # Draw ant trails
         if self.n_cities > 1:
             for trail in self.aco.get_ant_trails():
                 if len(trail) > 1:
@@ -621,9 +588,7 @@ class ACOVisualizer:
                     points.append(city)
             pygame.draw.lines(self.screen, (0, 0, 0), True, points, 2)
         
-        # Draw cities SECOND (on top of paths)
         for i, city in enumerate(self.cities):
-            # Handle both dictionary and tuple formats for backward compatibility
             if isinstance(city, dict):
                 x, y = city['x'], city['y']
             else:
@@ -631,9 +596,7 @@ class ACOVisualizer:
                 
             pygame.draw.circle(self.screen, CITY_COLOR, (x, y), 8)
         
-        # Draw city labels LAST (with background for better visibility)
         for i, city in enumerate(self.cities):
-            # Handle both dictionary and tuple formats for backward compatibility
             if isinstance(city, dict):
                 x, y = city['x'], city['y']
                 name = city.get('name', str(i))
@@ -641,20 +604,16 @@ class ACOVisualizer:
                 x, y = city
                 name = str(i)
                 
-            # Create label with background for visibility
             name_label = self.font.render(name, True, TEXT_COLOR)
             
-            # Calculate label background position and size
             label_bg = pygame.Rect(x + 10, y - 10, 
                                 name_label.get_width() + 4, 
                                 name_label.get_height() + 2)
             
-            # Draw semi-transparent white background
             bg_surface = pygame.Surface((label_bg.width, label_bg.height), pygame.SRCALPHA)
             bg_surface.fill((255, 255, 255, 200))  # White with alpha
             self.screen.blit(bg_surface, label_bg)
             
-            # Draw the text on top of background
             self.screen.blit(name_label, (x + 12, y - 9))
         
         # Draw ants
@@ -707,12 +666,10 @@ class ACOVisualizer:
                 if event.type == pygame.QUIT:
                     running = False
                 
-                # Handle mouse clicks for manual city placement
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left click
                     if self.manual_mode:
                         self.add_city(event.pos)
                 
-                # Process UI events
                 if event.type == pygame.USEREVENT:
                     if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                         if event.ui_element == self.start_button:
@@ -735,7 +692,6 @@ class ACOVisualizer:
                         elif event.ui_element == self.clear_cities_button:
                             self.clear_cities()
                             self.param_sliders['cities'].set_current_value(0)
-                        # Add handlers for new load/save buttons
                         elif event.ui_element == self.load_button:
                             self.load_cities_dialog()
                         elif event.ui_element == self.save_button:
@@ -769,8 +725,7 @@ class ACOVisualizer:
                             self.save_cities_dialog()
                 
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_s:  # 'S' key
-                        # Create file dialog for saving image
+                    if event.key == pygame.K_s:  
                         import tkinter as tk
                         from tkinter import filedialog
                         
@@ -793,28 +748,22 @@ class ACOVisualizer:
                 
                 self.ui_manager.process_events(event)
             
-            # Update ACO if not paused and not in manual mode
             if not self.paused and not self.manual_mode and self.n_cities > 1:
-                # Run the next iteration
                 self.aco.run_iteration()
                 
-                # Check if we're running to target and have reached it
                 if self.running_to_target:
                     target = int(self.target_iter_slider.get_current_value())
                     if self.aco.current_iteration >= target:
                         self.running_to_target = False
                         self.paused = True  # Pause when we reach the target
             
-            # Update UI
             self.ui_manager.update(time_delta)
             
-            # Draw everything
             self.draw()
         
         pygame.quit()
     
     def load_cities_dialog(self):
-        # Simple file dialog using Tkinter
         import tkinter as tk
         from tkinter import filedialog
         
@@ -841,11 +790,9 @@ class ACOVisualizer:
                 self.param_sliders['cities'].set_current_value(len(cities))
                 print(f"Loaded {len(cities)} cities from {file_path}")
                 
-                # Reset the simulation
                 self.paused = True
     
     def save_cities_dialog(self):
-        # Simple file dialog using Tkinter
         import tkinter as tk
         from tkinter import filedialog
         
@@ -866,24 +813,20 @@ class ACOVisualizer:
                 print("Failed to save cities")
     
     def run_to_target(self):
-        """Set up running to the target iteration with animation"""
         if self.n_cities < 2:
             return
             
         target = int(self.target_iter_slider.get_current_value())
         current = self.aco.current_iteration
         
-        # If we're already past the target, don't do anything
         if current >= target:
             return
             
-        # Enable running to target animation mode
         self.running_to_target = True
         self.paused = False
         self.manual_mode = False
 
     def draw_city_labels(self, full_labels=False):
-        """Draw labels for cities - either all or just highlighted ones"""
         
         for i, city in enumerate(self.cities):
             if isinstance(city, dict):
@@ -895,27 +838,20 @@ class ACOVisualizer:
                 x, y = city
                 name = str(i)
                 
-            # If full_labels is False, only show city number
             if not full_labels:
                 name = str(i) if isinstance(city, dict) else str(i)
             
-            # Create and position the label
             name_label = self.font.render(name, True, TEXT_COLOR)
             self.screen.blit(name_label, (x + 10, y - 10))
 
     def save_visualization_as_image(self, filename):
-        """Save the current ACO visualization as a PNG image with enhanced city labels and path information"""
-        # Create a copy of the current display surface
         image_surface = self.screen.copy()
         
-        # Clear any existing ant trails from the image (we only want final path)
         image_surface.fill(BG_COLOR)
         
-        # Draw panel background
         panel_rect = pygame.Rect(self.width - 280, 0, 280, self.height)
         pygame.draw.rect(image_surface, (220, 220, 220), panel_rect)
         
-        # Draw cities with enhanced labels
         large_font = pygame.font.SysFont(None, FONT_SIZE + 8)
         for i, city in enumerate(self.cities):
             if isinstance(city, dict):
@@ -925,10 +861,8 @@ class ACOVisualizer:
                 x, y = city
                 name = f"City {i+1}"
                 
-            # Draw larger city circles
             pygame.draw.circle(image_surface, CITY_COLOR, (x, y), 10)
             
-            # Draw clearer city names with background for better visibility
             name_label = large_font.render(name, True, (0, 0, 0))
             label_bg = pygame.Rect(x + 12, y - 12, name_label.get_width() + 4, name_label.get_height() + 4)
             pygame.draw.rect(image_surface, (255, 255, 255, 180), label_bg)
@@ -965,19 +899,16 @@ class ACOVisualizer:
         footer_surface.fill((240, 240, 240, 230))
         image_surface.blit(footer_surface, footer_rect)
         
-        # Add the information text
         y_pos = self.height - footer_height + 10
         for text in info_texts:
             text_surf = info_font.render(text, True, (0, 0, 0))
             image_surface.blit(text_surf, (20, y_pos))
             y_pos += 25
         
-        # Save the surface as PNG
         pygame.image.save(image_surface, filename)
         print(f"Visualization saved as {filename}")
         return True
 
-# Fix the error in load_cities_from_file function
 def load_cities_from_file(filename):
     try:
         # Determine file type by extension
@@ -995,12 +926,10 @@ def load_cities_from_file(filename):
         return None
 
 def load_from_csv(filename):
-    """Load cities from CSV file with full geographic data"""
     try:
         # Use pandas to read CSV properly
         df = pd.read_csv(filename)
         
-        print(f"\n========== CSV LOADING ==========")
         print(f"File: {filename}")
         print(f"Columns found: {list(df.columns)}")
         
@@ -1101,10 +1030,7 @@ def load_from_csv(filename):
         print(f"Successfully parsed {len(geo_cities)} cities with geographic data")
         
         if geo_cities:
-            print("Scaling geographic coordinates to screen coordinates...")
             scaled_cities = scale_geo_coords(geo_cities, SCREEN_WIDTH, SCREEN_HEIGHT)
-            print(f"Distance calculations will use haversine formula for geographic distances")
-            print("================================\n")
             
             # Add after parsing the data but before returning
             if geo_cities:
@@ -1135,7 +1061,6 @@ def load_from_csv(filename):
         return None
 
 def load_from_json(filename):
-    """Load cities from JSON file"""
     try:
         with open(filename, 'r') as f:
             data = json.load(f)
@@ -1173,10 +1098,8 @@ def load_from_json(filename):
                         if lat is not None and lng is not None:
                             geo_coords.append((lng, lat))  # Geo format: (longitude, latitude)
                     
-                    # Scale geo coordinates to screen coordinates
                     return scale_geo_coords(geo_coords, SCREEN_WIDTH, SCREEN_HEIGHT)
                 else:
-                    # Try x,y format
                     cities = []
                     for item in data:
                         if 'x' in item and 'y' in item:
@@ -1185,7 +1108,6 @@ def load_from_json(filename):
                     if cities:
                         return cities
             
-            # Handle simple array format [[x,y], [x,y], ...]
             cities = []
             for item in data:
                 if isinstance(item, list) and len(item) >= 2:
