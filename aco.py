@@ -1185,6 +1185,7 @@ def load_from_json(filename):
                     if cities:
                         return cities
             
+            # Handle simple array format [[x,y], [x,y], ...]
             cities = []
             for item in data:
                 if isinstance(item, list) and len(item) >= 2:
